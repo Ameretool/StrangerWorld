@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Stranger.World | Explore the Unknown, Connect Beyond Borders</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #05070A;
+            color: #EDF2F8;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Particle background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Glassmorphism Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(12px);
+            background: rgba(5, 7, 12, 0.7);
+            border-bottom: 1px solid rgba(108, 99, 255, 0.2);
+            z-index: 100;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #FFFFFF, #A78BFA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        .logo span {
+            font-weight: 500;
+            background: linear-gradient(135deg, #6C63FF, #FF6584);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #E2E8F0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: #A78BFA;
+        }
+
+        /* Language switcher */
+        .lang-switch {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(20, 25, 40, 0.7);
+            border-radius: 40px;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.4);
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: #CBD5E1;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: linear-gradient(95deg, #6C63FF, #FF6584);
+            color: white;
+            box-shadow: 0 2px 8px rgba(108,99,255,0.4);
+        }
+        .lang-btn:hover:not(.active) {
+            background: rgba(108, 99, 255, 0.3);
+            color: white;
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            border: 1px solid rgba(167, 139, 250, 0.6);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            color: #E2E8F0;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(108, 99, 255, 0.2);
+            border-color: #A78BFA;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(95deg, #6C63FF, #FF6584);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(108, 99, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #E2E8F0;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(108, 99, 255, 0.2);
+            border-color: #A78BFA;
+        }
+
+        .hero {
+            padding: 6rem 0 8rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            background: rgba(108, 99, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 100px;
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: #C4B5FD;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            background: linear-gradient(to right, #FFFFFF, #C4B5FD, #FFB3C6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #B9C7D9;
+            max-width: 650px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(120deg, #FFFFFF, #C4B5FD);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: #94A3B8;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .feature-card {
+            background: rgba(15, 20, 30, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(167, 139, 250, 0.6);
+            background: rgba(20, 25, 40, 0.7);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-icon {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #6C63FF, #FF6584);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            color: #A0B0C8;
+            font-size: 0.95rem;
+        }
+
+        .community-section {
+            background: radial-gradient(circle at 20% 30%, rgba(108, 99, 255, 0.08), transparent);
+            border-radius: 3rem;
+            padding: 3rem 2rem;
+            margin: 3rem 0 4rem;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+        }
+
+        .community-stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #A78BFA);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .stat-label {
+            color: #A0B0C8;
+            font-size: 0.9rem;
+        }
+        .avatar-cluster {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(145deg, #2D2A5E, #1E1B3A);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #C4B5FD;
+            border: 2px solid rgba(108, 99, 255, 0.4);
+            transition: 0.2s;
+        }
+
+        /* CTA Card */
+        .cta-card {
+            background: linear-gradient(125deg, rgba(20, 15, 45, 0.8), rgba(10, 10, 25, 0.9));
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            margin: 3rem 0 4rem;
+        }
+        .cta-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+        .notice-badge {
+            background: rgba(255, 101, 132, 0.2);
+            border-radius: 100px;
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            font-size: 0.7rem;
+            margin-bottom: 1rem;
+            border: 1px solid #FF6584;
+            color: #FFB3C6;
+        }
+        .footer {
+            padding: 2rem 0 2.5rem;
+            border-top: 1px solid rgba(108, 99, 255, 0.2);
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            row-gap: 1rem;
+        }
+        .social-icons a {
+            color: #94A3B8;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .social-icons a:hover {
+            color: #A78BFA;
+            transform: translateY(-4px);
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 1rem 0 0.8rem;
+        }
+        .footer-links a {
+            color: #9aa8c2;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .footer-links a:hover {
+            color: #C4B5FD;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1rem; }
+            .nav-container { flex-direction: column; }
+            .nav-right { width: 100%; justify-content: space-between; }
+            .section-title { font-size: 2rem; }
+            .social-icons { gap: 1.2rem; }
+            .footer-links { gap: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .nav-links { gap: 1rem; }
+            .hero { padding: 3rem 0 5rem; }
+            .social-icons { gap: 1rem; }
+            .social-icons a { font-size: 1.3rem; }
+        }
+        html { scroll-behavior: smooth; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-8px); }
+        }
+        .feature-card:hover .feature-icon {
+            animation: float 0.3s ease-in-out infinite alternate;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo">STRANGER.<span>WORLD</span></a>
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="#features" data-i18n-key="nav_explore">Explore</a>
+                <a href="#community" data-i18n-key="nav_community">Global Hub</a>
+                <a href="#join" class="btn-outline-light" data-i18n-key="nav_join">Join Journey</a>
+            </div>
+            <div class="lang-switch">
+                <button class="lang-btn active" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="zh">中文</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-globe-asia"></i> <span data-i18n-key="hero_badge">Stranger is opportunity · boundless discovery</span>
+            </div>
+            <h1 data-i18n-key="hero_title">Meet your next stranger,<br>unfold an unwrapped world</h1>
+            <p data-i18n-key="hero_desc">Cross borders and biases, meet fascinating souls on Stranger.World. Every conversation is a new dimension. Connect the unknown, build an open planet.</p>
+            <div class="hero-buttons">
+                <a href="#join" class="btn-primary" data-i18n-key="hero_btn_start"><i class="fas fa-compass"></i> Start exploring</a>
+                <a href="#features" class="btn-secondary" data-i18n-key="hero_btn_journey"><i class="fas fa-play-circle"></i> Take a glimpse</a>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <div id="features">
+            <h2 class="section-title" data-i18n-key="features_title">Warmth in the unfamiliar</h2>
+            <p class="section-sub" data-i18n-key="features_sub">Stranger.World isn't just a platform — it's a new way to connect, authentic, safe and full of wonder.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-random"></i></div>
+                    <h3 data-i18n-key="feature1_title">Serendipity Lab</h3>
+                    <p data-i18n-key="feature1_desc">Smart algorithms connect you with strangers worldwide. Language, culture, stories — each encounter is a unique adventure.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3 data-i18n-key="feature2_title">Anonymous & Human</h3>
+                    <p data-i18n-key="feature2_desc">Strong privacy protection lets you be your true self, express freely, and build meaningful temporary bonds.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div>
+                    <h3 data-i18n-key="feature3_title">Global Footprint</h3>
+                    <p data-i18n-key="feature3_desc">Stranger stories from 190+ countries shape a living map. Discover hidden traveler communities near and far.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Community -->
+        <div id="community" class="community-section">
+            <div style="text-align: center;">
+                <i class="fas fa-users" style="font-size: 2rem; background: linear-gradient(135deg,#6C63FF,#FF6584); -webkit-background-clip:text; background-clip:text; color:transparent;"></i>
+                <h2 class="section-title" style="margin-top: 0.5rem;" data-i18n-key="community_title">The Global Stranger Collective</h2>
+                <p class="section-sub" style="margin-bottom: 1rem;" data-i18n-key="community_sub">Over 12,000+ explorers from every corner exchanging sparks in the unknown.</p>
+            </div>
+            <div class="avatar-cluster">
+                <div class="avatar"><i class="fas fa-user-astronaut"></i></div>
+                <div class="avatar"><i class="fas fa-palette"></i></div>
+                <div class="avatar"><i class="fas fa-mountain"></i></div>
+                <div class="avatar"><i class="fas fa-code"></i></div>
+                <div class="avatar"><i class="fas fa-music"></i></div>
+                <div class="avatar"><i class="fas fa-camera"></i></div>
+                <div class="avatar"><i class="fas fa-book"></i></div>
+                <div class="avatar"><i class="fas fa-globe"></i></div>
+            </div>
+            <div class="community-stats">
+                <div class="stat-item">
+                    <div class="stat-number"><span id="strangerCount">12,846</span>+</div>
+                    <div class="stat-label" data-i18n-key="stat_active">Active Strangers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">190+</div>
+                    <div class="stat-label" data-i18n-key="stat_countries">Countries & Regions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label" data-i18n-key="stat_connects">Random Connections</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#" class="btn-secondary" style="background: rgba(108,99,255,0.2);" data-i18n-key="community_cta"><i class="fas fa-chart-line"></i> Join stranger network →</a>
+            </div>
+        </div>
+
+        <!-- Story Quote -->
+        <div style="text-align: center; margin: 2rem 0 1rem;">
+            <div style="max-width: 700px; margin: 0 auto; background: rgba(255,255,255,0.02); border-radius: 2rem; padding: 2rem; border-left: 4px solid #6C63FF;">
+                <i class="fas fa-quote-left" style="font-size: 2rem; color: #6C63FF; opacity: 0.7;"></i>
+                <p style="font-size: 1.2rem; font-style: italic; margin: 1rem 0; color:#CBD5E1;" data-i18n-key="quote_text">“Talked all night with a Tokyo illustrator about stars, then shared desert sunset secrets with a Cairo backpacker. On stranger.world, every stranger is an unopened letter.”</p>
+                <p style="font-weight: 600;" data-i18n-key="quote_author">— Community Explorer</p>
+            </div>
+        </div>
+
+        <!-- CTA Section: Under construction demo -->
+        <div id="join" class="cta-card">
+            <div class="notice-badge"><i class="fas fa-hard-hat"></i> <span data-i18n-key="construction_badge">UNDER CONSTRUCTION</span></div>
+            <h3 data-i18n-key="cta_title">Join the inner circle</h3>
+            <p data-i18n-key="cta_desc">Stranger.World is being forged. Be the first to know when we launch — no email required, just a click to feel the anticipation.</p>
+            <div style="margin-top: 2rem;">
+                <button id="notifyDemoBtn" class="btn-primary"><i class="fas fa-bell"></i> <span data-i18n-key="cta_button">Notify me when ready</span></button>
+            </div>
+            <p style="font-size: 0.8rem; margin-top: 1.2rem; color:#7E8AA2;" data-i18n-key="cta_footnote">✨ Experience preview mode · full features coming soon ✨</p>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <!-- Social Icons: Facebook, X, YouTube, TikTok, Instagram, Discord + newly added Twitter -->
+
+        <div class="social-icons">
+            <a href="https://facebook.com/strangerworld" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="https://x.com/strangerworld" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://youtube.com/strangerworld" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="https://tiktok.com/@strangerworld" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+            <a href="https://instagram.com/strangerworld" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://discord.gg/strangerworld" target="_blank" rel="noopener noreferrer" aria-label="Discord"><i class="fab fa-discord"></i></a>
+            <a href="https://twitter.com/strangerworld" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+
+        <!-- Custom link section: GB.ooo + extra info -->
+        <div class="footer-links">
+            <a href="https://gb.ooo" target="_blank" rel="noopener noreferrer" class="gb-link">⚡ GB.ooo</a>
+        </div>
+
+        <p style="color: #64748B; font-size: 0.85rem; margin-top: 0.5rem;" data-i18n-key="footer_copyright">© 2026 Stranger.World — Embrace the strange, cross all borders | Explore real connections</p>
+        <p style="color: #475569; font-size: 0.75rem; margin-top: 0.5rem;" data-i18n-key="footer_tagline">✨ Every conversation creates a tiny parallel universe ✨</p>
+    </div>
+</footer>
+
+<script>
+    // --- Particle Background ---
+    const canvas = document.getElementById('particle-canvas');
+    let ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    const PARTICLE_COUNT = 120;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = (Math.random() - 0.5) * 0.2;
+            this.opacity = Math.random() * 0.6 + 0.2;
+            this.color = `rgba(140, 120, 255, ${this.opacity})`;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0) this.x = width;
+            if (this.x > width) this.x = 0;
+            if (this.y < 0) this.y = height;
+            if (this.y > height) this.y = 0;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+    }
+    function animateParticles() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        for (let p of particles) { p.update(); p.draw(); }
+        requestAnimationFrame(animateParticles);
+    }
+    function setupCanvas() {
+        resizeCanvas();
+        initParticles();
+        animateParticles();
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+    setupCanvas();
+
+    // Cosmetic stranger counter
+    let currentCount = 12846;
+    const strangerElem = document.getElementById('strangerCount');
+    function updateStrangerCount() {
+        const increment = Math.floor(Math.random() * 5) + 1;
+        currentCount = currentCount + increment;
+        if (currentCount > 13500) currentCount = 12850;
+        if (strangerElem) strangerElem.innerText = currentCount.toLocaleString();
+    }
+    setInterval(updateStrangerCount, 8000);
+
+    // --- i18n translations (EN / ZH) ---
+    const translations = {
+        en: {
+            nav_explore: "Explore",
+            nav_community: "Global Hub",
+            nav_join: "Join Journey",
+            hero_badge: "Stranger is opportunity · boundless discovery",
+            hero_title: "Meet your next stranger,<br>unfold an unwrapped world",
+            hero_desc: "Cross borders and biases, meet fascinating souls on Stranger.World. Every conversation is a new dimension. Connect the unknown, build an open planet.",
+            hero_btn_start: "Start exploring",
+            hero_btn_journey: "Take a glimpse",
+            features_title: "Warmth in the unfamiliar",
+            features_sub: "Stranger.World isn't just a platform — it's a new way to connect, authentic, safe and full of wonder.",
+            feature1_title: "Serendipity Lab",
+            feature1_desc: "Smart algorithms connect you with strangers worldwide. Language, culture, stories — each encounter is a unique adventure.",
+            feature2_title: "Anonymous & Human",
+            feature2_desc: "Strong privacy protection lets you be your true self, express freely, and build meaningful temporary bonds.",
+            feature3_title: "Global Footprint",
+            feature3_desc: "Stranger stories from 190+ countries shape a living map. Discover hidden traveler communities near and far.",
+            community_title: "The Global Stranger Collective",
+            community_sub: "Over 12,000+ explorers from every corner exchanging sparks in the unknown.",
+            stat_active: "Active Strangers",
+            stat_countries: "Countries & Regions",
+            stat_connects: "Random Connections",
+            community_cta: "Join stranger network →",
+            quote_text: "“Talked all night with a Tokyo illustrator about stars, then shared desert sunset secrets with a Cairo backpacker. On stranger.world, every stranger is an unopened letter.”",
+            quote_author: "— Community Explorer",
+            construction_badge: "UNDER CONSTRUCTION",
+            cta_title: "Join the inner circle",
+            cta_desc: "Stranger.World is being forged. Be the first to know when we launch — no email required, just a click to feel the anticipation.",
+            cta_button: "Notify me when ready",
+            cta_footnote: "✨ Experience preview mode · full features coming soon ✨",
+            footer_copyright: "© 2026 Stranger.World — Embrace the strange, cross all borders | Explore real connections",
+            footer_tagline: "✨ Every conversation creates a tiny parallel universe ✨"
+        },
+        zh: {
+            nav_explore: "探索",
+            nav_community: "全球社群",
+            nav_join: "加入旅程",
+            hero_badge: "陌生即机遇 · 无止境探索",
+            hero_title: "遇见下一个陌生人，<br>发现未拆封的世界",
+            hero_desc: "跨越边界与偏见，在 Stranger.World 与有趣的灵魂相遇，每一次对话都是全新维度。连接未知，共建开放星球。",
+            hero_btn_start: "开始探索",
+            hero_btn_journey: "奇妙之旅",
+            features_title: "在陌生中重获温度",
+            features_sub: "Stranger.World 不仅仅是一个平台，而是一种新的连接方式，真实、安全且充满惊喜。",
+            feature1_title: "随机的浪漫",
+            feature1_desc: "智能算法将你与全球的“陌生人”连接，语言、文化、故事 — 每次相遇都是独一无二的探险。",
+            feature2_title: "匿名且有温度",
+            feature2_desc: "强隐私保护机制让你安全展现真实的自我，无压力表达，建立有意义的临时羁绊。",
+            feature3_title: "真实地图足迹",
+            feature3_desc: "来自190+国家的陌生故事汇聚成世界地图，发现远方和身边的隐藏旅行者社群。",
+            community_title: "全球陌生人共同体",
+            community_sub: "来自世界每个角落，超过 12,000+ 位探索者每天都在未知中交换火花。",
+            stat_active: "活跃陌生人",
+            stat_countries: "国家与地区",
+            stat_connects: "随机对话时刻",
+            community_cta: "加入陌生人网络 →",
+            quote_text: "“和东京的插画师聊了一夜星空，又和开罗的背包客分享了沙漠日落的秘密。在 stranger.world，每一个陌生人都是一封未拆的信。”",
+            quote_author: "— 社区探险家",
+            construction_badge: "网站建设中",
+            cta_title: "加入内部圈子",
+            cta_desc: "Stranger.World 正在构建中。无需邮箱，抢先得知上线消息 — 点击按钮感受期待。",
+            cta_button: "提醒我上线",
+            cta_footnote: "✨ 预览体验版 · 完整功能即将到来 ✨",
+            footer_copyright: "© 2026 Stranger.World — 拥抱陌生，跨越边界 | 探索真实连接",
+            footer_tagline: "✨ 每一次对话，都在创造一个微小的平行宇宙 ✨"
+        }
+    };
+
+    let currentLang = 'en';
+
+    function updateLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-i18n-key]').forEach(el => {
+            const key = el.getAttribute('data-i18n-key');
+            if (translations[lang] && translations[lang][key]) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = translations[lang][key];
+                } else if (el.tagName === 'BUTTON' && el.classList.contains('lang-btn') === false) {
+                    el.innerHTML = translations[lang][key];
+                } else {
+                    if (key === 'hero_title') {
+                        el.innerHTML = translations[lang][key];
+                    } else {
+                        el.innerText = translations[lang][key];
+                    }
+                }
+            }
+        });
+        const notifySpan = document.querySelector('#notifyDemoBtn span');
+        if (notifySpan) notifySpan.innerText = translations[lang].cta_button;
+        const startBtn = document.querySelector('.hero-buttons .btn-primary');
+        if (startBtn) {
+            const iconHtml = '<i class="fas fa-compass"></i> ';
+            startBtn.innerHTML = iconHtml + translations[lang].hero_btn_start;
+        }
+        const glimpseBtn = document.querySelector('.hero-buttons .btn-secondary');
+        if (glimpseBtn) {
+            const iconHtml = '<i class="fas fa-play-circle"></i> ';
+            glimpseBtn.innerHTML = iconHtml + translations[lang].hero_btn_journey;
+        }
+        const communityCta = document.querySelector('#community .btn-secondary');
+        if (communityCta) {
+            const iconHtml = '<i class="fas fa-chart-line"></i> ';
+            communityCta.innerHTML = iconHtml + translations[lang].community_cta;
+        }
+        const navJoin = document.querySelector('.nav-links .btn-outline-light');
+        if (navJoin) navJoin.innerText = translations[lang].nav_join;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.getAttribute('data-lang') === lang) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const lang = btn.getAttribute('data-lang');
+            if (lang === 'en') updateLanguage('en');
+            else if (lang === 'zh') updateLanguage('zh');
+        });
+    });
+    updateLanguage('en');
+
+    // Demo "Notify Me" button: under construction message
+    const notifyBtn = document.getElementById('notifyDemoBtn');
+    function showToastMessage(message) {
+        let toast = document.createElement('div');
+        toast.innerText = message;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '30px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.backgroundColor = '#1E293B';
+        toast.style.color = '#E2E8F0';
+        toast.style.padding = '12px 24px';
+        toast.style.borderRadius = '80px';
+        toast.style.borderLeft = `4px solid #FFB347`;
+        toast.style.backdropFilter = 'blur(12px)';
+        toast.style.fontWeight = '500';
+        toast.style.zIndex = '9999';
+        toast.style.fontSize = '0.9rem';
+        toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.3)';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    notifyBtn.addEventListener('click', () => {
+        const msg = currentLang === 'en' 
+            ? '🌍 Stranger.World is under construction. Full launch coming soon — stay curious!' 
+            : '🌍 Stranger.World 正在建设中，完整功能即将开放，敬请期待！';
+        showToastMessage(msg);
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+            if (targetId && targetId !== '#') {
+                const targetElem = document.querySelector(targetId);
+                if (targetElem) {
+                    e.preventDefault();
+                    targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
