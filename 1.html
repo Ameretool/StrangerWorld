@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Stranger.World · 遇见下一位陌生人</title>
+    <!-- 简洁的现代风格，无外部依赖，完全内嵌 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #fefcf7;
+            color: #1a2a2f;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.4;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* 按钮、交互样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #1e3a3f;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 32px;
+            font-size: 1.125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-large {
+            padding: 14px 40px;
+            font-size: 1.25rem;
+        }
+
+        .btn:hover {
+            background-color: #0f2a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -12px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #1e3a3f;
+            color: #1e3a3f;
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: rgba(30,58,63,0.05);
+            transform: translateY(-1px);
+        }
+
+        /* 模态框（弹窗） */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: white;
+            max-width: 440px;
+            width: 90%;
+            padding: 32px 28px;
+            border-radius: 32px;
+            text-align: center;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.25);
+            position: relative;
+        }
+        .modal-card h3 {
+            font-size: 1.75rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        .modal-card p {
+            color: #4a5b5f;
+            margin-bottom: 20px;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 48px;
+            border: 1px solid #dce5e2;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .modal-input:focus {
+            border-color: #1e3a3f;
+            box-shadow: 0 0 0 2px rgba(30,58,63,0.2);
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #8b9b9f;
+            line-height: 1;
+        }
+        .toast-msg {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #2f7d5c;
+        }
+
+        /* 通用区块间距 */
+        section {
+            padding: 80px 0;
+            border-bottom: 1px solid #efeae2;
+        }
+        .section-sm {
+            padding: 60px 0;
+        }
+        .hero {
+            padding-top: 100px;
+            padding-bottom: 80px;
+            border-bottom: 1px solid #efeae2;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 48px 32px;
+            margin-top: 48px;
+        }
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 32px;
+            margin-top: 48px;
+        }
+        .step-item {
+            flex: 1;
+            min-width: 200px;
+            background: #f9f6ef;
+            padding: 32px 20px;
+            border-radius: 32px;
+            text-align: center;
+        }
+        .stat-badge {
+            background: white;
+            border-radius: 48px;
+            padding: 4px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #1e3a3f;
+            border: 1px solid #e2dad0;
+        }
+        h1 {
+            font-size: 3.4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: #14282c;
+        }
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            margin-bottom: 20px;
+        }
+        .lead {
+            font-size: 1.25rem;
+            color: #3f555a;
+            max-width: 680px;
+            margin-bottom: 36px;
+        }
+        .flex-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        .testimonial {
+            background: #f4f1ea;
+            border-radius: 40px;
+            padding: 48px 40px;
+            margin: 48px 0 32px;
+        }
+        .footer {
+            background: #f1ede6;
+            padding: 48px 0;
+            border-top: none;
+            text-align: center;
+            color: #476368;
+        }
+        .safety-note {
+            background: #eef3f0;
+            border-radius: 60px;
+            padding: 14px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .counter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 24px;
+            background: #ffffffd9;
+            border-radius: 48px;
+            padding: 24px 32px;
+            margin: 32px 0;
+            border: 1px solid #e2dad0;
+        }
+        .counter-item {
+            text-align: center;
+            flex: 1;
+        }
+        .counter-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1e3a3f;
+        }
+        hr {
+            margin: 32px 0;
+            border: 0;
+            height: 1px;
+            background: #e2dad0;
+        }
+        @media (max-width: 700px) {
+            h1 { font-size: 2.4rem; }
+            h2 { font-size: 1.8rem; }
+            .hero { padding-top: 60px; }
+            section { padding: 60px 0; }
+            .counter-number { font-size: 1.6rem; }
+            .testimonial { padding: 32px 24px; }
+        }
+        .project-phase {
+            display: inline-block;
+            background: #e9e4db;
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        button {
+            background: none;
+            border: none;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="modal" id="emailModal">
+    <div class="modal-card">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h3>✨ 解锁无界之旅</h3>
+        <p>上线第一时间通知你，无需下载，网页版内测资格优先</p>
+        <input type="email" id="modalEmailInput" class="modal-input" placeholder="你的电子邮箱" autocomplete="email">
+        <button class="btn" id="submitModalBtn">🎯 提醒我上线</button>
+        <div id="modalToast" class="toast-msg"></div>
+        <p style="font-size: 0.75rem; margin-top: 20px; color:#7e8e8f;">不骚扰 · 仅用于通知内测开放</p>
+    </div>
+</div>
+
+<main>
+    <!-- Hero 首屏区域 -->
+    <div class="hero">
+        <div class="container">
+            <div class="project-phase">🌍 匿名社交实验 · 预热中</div>
+            <h1>遇见下一位陌生人，<br>展开一个无界的世界。</h1>
+            <p class="lead">Stranger.World 是一个安全、匿名、有温度的全球随机对话社区。<br>跨越偏见与边界，与190+国家的有趣灵魂，交换故事。</p>
+            <div class="flex-btns">
+                <button class="btn btn-large" id="heroModalTrigger">🔔 申请内测资格 →</button>
+                <a href="#howitworks" class="btn-outline btn" style="background:transparent;">✨ 探索更多</a>
+            </div>
+            <div style="margin-top: 28px; font-size: 0.9rem; color:#5e7276;">
+                ✅ 已积累 12,000+ 探索者 · 上线后第一时间通知
+            </div>
+        </div>
+    </div>
+
+    <!-- 三大功能 模块2 -->
+    <section>
+        <div class="container">
+            <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+                <span class="stat-badge">核心体验</span>
+                <h2>温暖、随机、无负担</h2>
+                <p style="color: #4f666b;">每一次对话都是一次奇遇，像打开未知的信封。</p>
+            </div>
+            <div class="grid-3">
+                <div>
+                    <div class="feature-icon">🎲</div>
+                    <div class="feature-title">奇遇实验室</div>
+                    <p style="color:#476368;">选择你的兴趣标签（电影/音乐/旅行/深夜思考），算法为你匹配同频陌生人。每一次滑动都是新的可能性。</p>
+                </div>
+                <div>
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-title">匿名 & 人性</div>
+                    <p style="color:#476368;">端到端加密聊天，不强制绑定手机号。可随时安静离开，只聊故事，不留负担。真实表达更自由。</p>
+                </div>
+                <div>
+                    <div class="feature-icon">🌍</div>
+                    <div class="feature-title">全球足迹</div>
+                    <p style="color:#476368;">实时查看在线国家热力，对话跨越时区。与东京插画师聊星空，与开罗背包客分享日落。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 如何工作 模块3 (步骤) -->
+    <section id="howitworks" style="background-color: #fefaf3;">
+        <div class="container">
+            <div style="text-align: center;">
+                <span class="stat-badge">简单三步</span>
+                <h2>它是如何工作的</h2>
+                <p style="color:#4f666b;">无需复杂注册，从心出发</p>
+            </div>
+            <div class="steps">
+                <div class="step-item">
+                    <div style="font-size: 2.2rem; margin-bottom: 16px;">🎧 1</div>
+                    <div class="feature-title" style="font-size: 1.35rem;">选择心情或话题</div>
+                    <p style="color:#476368;">树洞 · 脑洞 · 文化日常 · 深夜电台，一键选定兴趣标签。</p>
+                </div>
+                <div class="step-item">
+                    <div style="font-size: 2.2rem; margin-bottom: 16px;">🔄 2</div>
+                    <div class="feature-title" style="font-size: 1.35rem;">开始随机匹配</div>
+                    <p style="color:#476368;">对方看不到你的身份，只看到共同标签，安全破冰。</p>
+                </div>
+                <div class="step-item">
+                    <div style="font-size: 2.2rem; margin-bottom: 16px;">💬 3</div>
+                    <div class="feature-title" style="font-size: 1.35rem;">展开限时对话</div>
+                    <p style="color:#476368;">可随时优雅离场，或保存匿名回忆卡片。每一刻由你掌控。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 社会信任+数据证明 模块4 -->
+    <section>
+        <div class="container">
+            <div class="counter-grid">
+                <div class="counter-item"><div class="counter-number">12,846+</div><div>活跃陌生人</div></div>
+                <div class="counter-item"><div class="counter-number">190+</div><div>国家/地区</div></div>
+                <div class="counter-item"><div class="counter-number">24/7</div><div>随机连接</div></div>
+            </div>
+
+            <div class="testimonial">
+                <span style="font-size: 2rem; opacity: 0.6;">“</span>
+                <p style="font-size: 1.3rem; font-style: normal; font-weight: 400; margin: 16px 0;">和一个东京插画师聊星空聊到凌晨3点，第二天又和开罗的背包客分享了沙漠日落。<br>每个陌生人，都是一封未拆的信。”</p>
+                <div style="margin-top: 20px;">—— 来自东京的 <strong>Mia</strong> · 早期测试者</div>
+            </div>
+
+            <div class="safety-note">
+                <span>🛡️ 安全承诺</span>
+                <span>本平台遵循《社区安全准则》</span>
+                <span>禁止骚扰与仇恨言论 | 一键举报 | 匿名盾牌保护</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 透明化项目状态 + 强行动模块5 （再次收集邮箱）-->
+    <section style="background: #ffffff; border-bottom: 1px solid #efeae2;">
+        <div class="container" style="text-align: center;">
+            <div class="project-phase" style="background:#e2e0da;">🚧 当前阶段</div>
+            <h2>封闭内测准备中</h2>
+            <p style="max-width: 600px; margin: 0 auto 20px; color:#3a5b62;">预计开放时间：2026年Q3 · 平台首发网页版（PC / 手机浏览器）<br>后续计划推出 iOS / 安卓原生应用。</p>
+            <div style="margin: 40px auto 20px; max-width: 480px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
+                    <button class="btn btn-large" id="secondModalTrigger">🚀 加入内测名单 →</button>
+                </div>
+                <p style="font-size: 0.8rem; margin-top: 20px; color:#687b7f;">留下邮箱，上线第一时间通知，无需任何费用</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚模块6 -->
+    <footer class="footer">
+        <div class="container">
+            <div style="font-weight: 500; font-size: 1.5rem; letter-spacing: -0.5px;">Stranger.World</div>
+            <div style="margin: 16px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; font-size: 0.9rem;">
+                <a href="#" style="opacity: 0.8;">隐私政策</a>
+                <a href="#" style="opacity: 0.8;">行为准则</a>
+                <a href="#" style="opacity: 0.8;">常见问题</a>
+                <a href="mailto:hello@stranger.world" style="opacity: 0.8;">hello@stranger.world</a>
+            </div>
+            <div style="font-size: 0.8rem; opacity: 0.7;">© 2026 Stranger.World · 匿名社交实验项目 · 无界连接</div>
+        </div>
+    </footer>
+</main>
+
+<script>
+    // 获取弹窗元素
+    const modal = document.getElementById('emailModal');
+    const heroBtn = document.getElementById('heroModalTrigger');
+    const secondBtn = document.getElementById('secondModalTrigger');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const submitModalBtn = document.getElementById('submitModalBtn');
+    const modalEmailInput = document.getElementById('modalEmailInput');
+    const modalToast = document.getElementById('modalToast');
+
+    // 辅助函数: 显示弹窗
+    function openModal() {
+        modal.style.display = 'flex';
+        modalEmailInput.value = '';
+        modalToast.innerText = '';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        modalToast.innerText = '';
+    }
+
+    // 邮箱校验简单且友好
+    function isValidEmail(email) {
+        return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email);
+    }
+
+    // 记录提交 (模拟后端存储，显示成功提示)
+    function submitEmail(email) {
+        // 这里仅前端演示存储 + 可打印console，实际可接入API，此处模拟成功
+        console.log(`[Stranger.World] 内测申请邮箱: ${email}`);
+        // 也可以保存在 localStorage 中防止重复提醒
+        let submitted = localStorage.getItem('sw_subscribed');
+        if(submitted && submitted === email) {
+            modalToast.innerText = '✨ 你已经加入过名单啦，上线通知不会遗漏。';
+        } else {
+            localStorage.setItem('sw_subscribed', email);
+            modalToast.innerText = '🎉 成功加入！上线时将第一时间通知你。';
+        }
+        // 可选: 2秒后自动关闭弹窗
+        setTimeout(() => {
+            if(modal.style.display === 'flex') {
+                closeModal();
+            }
+        }, 2200);
+    }
+
+    // 处理提交动作
+    function handleSubmit() {
+        const email = modalEmailInput.value.trim();
+        if(!email) {
+            modalToast.innerText = '📧 请输入电子邮箱地址';
+            return;
+        }
+        if(!isValidEmail(email)) {
+            modalToast.innerText = '🔍 邮箱格式似乎不对，请再检查一下 (例如 name@domain.com)';
+            return;
+        }
+        submitEmail(email);
+    }
+
+    // 绑定各种打开弹窗的按钮
+    heroBtn.addEventListener('click', openModal);
+    secondBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    submitModalBtn.addEventListener('click', handleSubmit);
+    // 点击模态背景关闭（点击模态外部区域）
+    modal.addEventListener('click', function(e) {
+        if(e.target === modal) {
+            closeModal();
+        }
+    });
+    // 支持回车提交
+    modalEmailInput.addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            handleSubmit();
+        }
+    });
+
+    // 小优化：所有占位的 # 链接阻止跳转
+    const allFakeLinks = document.querySelectorAll('a[href="#"]');
+    allFakeLinks.forEach(link => {
+        link.addEventListener('click', (e) => e.preventDefault());
+    });
+    // 可选平滑滚动锚点，增强体验
+    document.querySelectorAll('a[href^="#howitworks"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector('#howitworks');
+            if(target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+    // 确保项目状态友好
+    console.log("Stranger.World 预热落地页 | 匿名连接实验");
+</script>
+</body>
+</html>
